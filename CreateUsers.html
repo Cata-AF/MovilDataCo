@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Usuarios</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="CreateUsers.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full flex items-center justify-center">
+    <header>
+        <div class="back">
+            <div class="menu container">
+                <a href="#" class="logo">MOVILDATACO</a>
+                <input type="checkbox" id="menu" />
+                <label for="menu">
+                    <img src="Images/menu.png" class="menu-icon" alt="">
+                </label>
+                <nav class="navbar">
+                    <ul>
+                        <li><a href="#">Estadísticas</a></li>
+                        <li><a href="#">Sobre nosotros</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="h-full flex justify-center flex-col w-full">
+        <button
+            class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 border-b-4 border-cyan-800 hover:border-cyan-700 rounded w-[160px] mb-5 ml-5">Agregar
+            usuario</button>
+        <table style="border: black; align-content: center;">
+            <thead>
+                <tr style="width:100%">
+                    <th style="width:30%">Nombre</th>
+                    <th style="width:10%">Rol</th>
+                    <th style="width:30%">Email</th>
+                    <th style="width:10%">Documento de Identidad</th>
+                    <th style="width:70%">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Ejemplo de fila de usuario -->
+                <tr>
+                    <td>Pepito</td>
+                    <td>Analista</td>
+                    <td>pepito@mail.com</td>
+                    <td>12345678</td>
+                    <td>
+                        <button
+                            class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 border-b-4 border-green-800 hover:border-green-700 rounded mx-10 my-5">Editar</button>
+                        <button
+                            class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 border-b-4 border-red-800 hover:border-red-700 rounded mr-5">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

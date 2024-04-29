@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full flex items-center justify-center">
+    <header>
+        <div class="back">
+            <div class="menu container">
+                <a href="#" class="logo">MOVILDATACO</a>
+                <input type="checkbox" id="menu"/>
+                <label for="menu">
+                    <img src="Images/menu.png" class="menu-icon" alt="">
+                </label>
+                <nav class="navbar">
+                    <ul>
+                        <li><a href="#">Estadísticas</a></li>
+                        <li><a href="#">Sobre nosotros</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="max-w-[920px]">
+        <h2 class=" text-3xl font-bold text-center mb-5">REGISTRO</h2>
+        <form class="text-xl">
+            <div class="grid grid-cols-2 mx-3">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label>Nombre</label>
+                        <input class="shadow appearance-none border rounded w-41 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text">
+                    </div>
+                    <div class="flex items-center my-5 justify-between">
+                        <label>Número de <br> Cédula</label>
+                        <input class="shadow appearance-none border rounded w-41 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="tel">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label>Contraseña</label>
+                        <input class="shadow appearance-none border rounded w-41 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="password">
+                    </div>
+                </div>
+                <div class="ml-5">
+                    <div class="flex items-center justify-between">
+                        <label>Apellidos</label>
+                        <input class="shadow appearance-none border rounded w-41 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text">
+                    </div>
+                    <div class="flex items-center my-5 justify-between">
+                        <label>Correo Electrónico</label>
+                        <input class="shadow appearance-none border rounded w-41 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="email">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label>Repita la Contraseña</label>
+                        <input class="shadow appearance-none border rounded w-41 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="password">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <button type="submit" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 border-b-4 border-green-800 hover:border-green-700 rounded my-5">REGISTRAR</button>
+            </div>
+            <div class="flex justify-end">
+                <button type="reset" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 border-b-4 border-red-800 hover:border-red-700 rounded">CANCELAR</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

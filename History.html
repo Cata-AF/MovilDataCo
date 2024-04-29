@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Histórico</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <header>
+            <div class="back">
+                <div class="menu container">
+                    <a href="#" class="logo">MOVILDATACO</a>
+                    <input type="checkbox" id="menu"/>
+                    <label for="menu">
+                        <img src="Images/menu.png" class="menu-icon" alt="">
+                    </label>
+                    <nav class="navbar">
+                        <ul>
+                            <li><a href="#">Estadísticas</a></li>
+                            <li><a href="#">Sobre nosotros</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <button type="button">Ver histórico</button>
+        <button type="button">Realizar tendencia</button>
+        <div  class="form-content">
+            <div>
+                <input type="radio" name="plan"/><span>Plan Prepago</span>
+            </div>
+            <div>
+                <input type="radio" name="plan"/><span>Plan Postpago</span>
+            </div>
+        </div>
+        <div  class="form-content">
+            <div>
+                <span>Desde </span><input type="date" name="plan"/>
+            </div>
+            <div>
+                <span>Hasta </span><input type="date" name="plan"/>
+            </div>
+        </div>
+        <div  class="form-content">
+            <div>
+                <input type="checkbox" name="operador"/><span>CLARO</span>
+            </div>
+            <div>
+                <input type="checkbox" name="operador"/><span>MOVISTAR</span>
+            </div>
+            <div>
+                <input type="checkbox" name="operador"/><span>TIGO</span>
+            </div>
+            <div>
+                <input type="checkbox" name="operador"/><span>ETB</span>
+            </div>
+            <div>
+                <input type="checkbox" name="operador"/><span>WOM</span>
+            </div>
+
+            <button type="submit">Realizar consulta</button>
+        </div>
+
+        <h1>GRAFICA 1</h1>
+        <h1>GRAFICA 2</h1>
+        <h1>GRAFICA 3</h1>
+
+        <button type="submit">Exportar en archivo excel</button>
+
+    </body>
+</html>
