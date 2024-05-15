@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creación de usuarios</title>
+    <link rel="stylesheet" href={% static 'CreateUsers.css' %}>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <main>
+        <div class="main-form">
+            <form action="{% url 'create_usuario' %}" method="POST">
+                {% csrf_token %}
+                <input type="text" name="nombre" placeholder="Nombres">
+                <input type="text" name="rol" placeholder="Rol">
+                <input type="text" name="email" placeholder="E-mail">
+                <input type="text" name="numero" placeholder="Número de celular">
+                <button>Save</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
