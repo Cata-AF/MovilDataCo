@@ -1,10 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tendencia</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href={% static 'style.css' %}>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
         <header>
@@ -24,8 +26,11 @@
                 </div>
             </div>
         </header>
-        <button type="button">Ver histórico</button>
-        <button type="button">Realizar tendencia</button>
+        <a href="view_Historia"
+           type="submit" class="bg-red-300 hover:bg-red-500 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-700 rounded my-5">Ver histórico</a>
+
+        <a href="view_Tendencia"
+           type="submit" class="bg-red-600 hover:bg-red-600 text-white font-bold py-2 px-4 border-b-4 border-red-800 hover:border-red-800 rounded my-5">Realizar tendencia</a>
         <div  class="form-content">
             <div>
                 <input type="radio" name="plan"/><span>Plan Prepago</span>

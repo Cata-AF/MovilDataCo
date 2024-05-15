@@ -6,6 +6,32 @@ from .models import Usuarios
 def inicio(request):
     return render(request, 'MainInterface.html')
 
+def help_password(request):
+    return render(request, 'HelpPassword.html')
+
+def password_reset(request):
+    return render(request, 'PasswordReset.html')
+
+def new_account(request):
+    return render(request, 'RegisterInterface.html')
+
+
+def what_choice(request):
+    return render(request, 'Choice.html')
+
+def file_upload(request):
+    return render(request, 'FileUpload.html')
+
+def processing_file(request):
+    return render(request, 'Processing.html')
+
+def view_History(request):
+    return render(request, 'History.html')
+
+def view_Shift(request):
+    return render(request, 'Shift.html')
+
+
 def view_usuarios(request):
     usuarios = Usuarios.objects.all()
     return render(request, 'Users.html', {'users': usuarios})

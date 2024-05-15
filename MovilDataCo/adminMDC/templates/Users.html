@@ -31,8 +31,7 @@
     </header>
     <div class="h-full flex justify-center flex-col w-full">
         <a  href="create_users"
-            class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 border-b-4 border-cyan-800 hover:border-cyan-700 rounded w-[160px] mb-5 ml-5">Agregar
-            usuario</a>
+            class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 border-b-4 border-cyan-800 hover:border-cyan-700 rounded w-[160px] mb-5 ml-5">Agregar usuario</a>
         <table style="border: black; align-content: center;">
             <thead>
                 <tr style="width:100%">
@@ -52,8 +51,8 @@
                     <td>{{usuario.email}}</td>
                     <td>{{usuario.numero}}</td>
                     <td>
-                        <a
-                            class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 border-b-4 border-green-800 hover:border-green-700 rounded mx-10 my-5">Editar</a>
+                        <a href=""
+                           class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 border-b-4 border-green-800 hover:border-green-700 rounded mx-10 my-5">Editar</a>
                         {% comment %} <a href="{% url 'edit_user' user.id %}"> {% endcomment %}
                         <form 
                             action= "{% url 'delete_user' usuario.id %}"
