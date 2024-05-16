@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render, redirect
-from .models import Abonados, Trafico, Usuarios
+from .models import Abonados, Ingresos, Trafico, Usuarios
 from django.db import models
 
 # Create your views here.
@@ -30,14 +30,19 @@ def processing_file(request):
 def view_History(request):
     abonados = Abonados.objects.all()
     trafico = Trafico.objects.all()
+    ingresos = Ingresos.objects.all()
     return render(request, 'History.html', {
         "abonados": abonados,
         "abonados_data": json.dumps(list(abonados.values())),
-        "trafico_data": json.dumps(list(trafico.values()))
+        "trafico_data": json.dumps(list(trafico.values())),
+        "ingresos_data": json.dumps(list(ingresos.values())),
     })
 
 def view_Shift(request):
-    return render(request, 'Shift.html')
+    abonados = Abonados.objects.all()
+    return render(request, 'Shift.html',{
+        "abonados_data": json.dumps(list(abonados.values())),
+    })
 
 
 def view_usuarios(request):

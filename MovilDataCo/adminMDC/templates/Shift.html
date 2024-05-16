@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tendencia</title>
         <link rel="stylesheet" href={% static 'style.css' %}>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
@@ -31,46 +32,183 @@
 
         <a href="view_Tendencia"
            type="submit" class="bg-red-600 hover:bg-red-600 text-white font-bold py-2 px-4 border-b-4 border-red-800 hover:border-red-800 rounded my-5">Realizar tendencia</a>
+
         <div  class="form-content">
             <div>
-                <input type="radio" name="plan"/><span>Plan Prepago</span>
+                <span>Desde </span>
+                <input type="date" id="date-from" min="2012-01-01" value="2012-01-01" max="2022-12-30" onchange="on_change_dates()"/>
             </div>
             <div>
-                <input type="radio" name="plan"/><span>Plan Postpago</span>
+                <span>Hasta </span>
+                <input type="date" id="date-to" min="2012-01-01" value="2022-12-01" max="2022-12-30" onchange="on_change_dates()"/>
             </div>
         </div>
-        <div  class="form-content">
-            <div>
-                <span>Desde </span><input type="date" name="plan"/>
-            </div>
-            <div>
-                <span>Hasta </span><input type="date" name="plan"/>
-            </div>
-        </div>
-        <div  class="form-content">
-            <div>
-                <input type="checkbox" name="operador"/><span>CLARO</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>MOVISTAR</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>TIGO</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>ETB</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>WOM</span>
-            </div>
+        
+        <div class="checkbox-filter-container" id="filters_container"></div>
 
-            <button type="submit">Realizar consulta</button>
-        </div>
+        <div id="chart_tendencia" style="height: 500px;"></div>
 
-        <h1>GRAFICA 1</h1>
-        <p>probando xd</p>
+        <script type="text/javascript">
+            google.charts.load('current', {packages: ['corechart',"line"]});
+            google.charts.setOnLoadCallback(load_abonados_chart);
+            
+            let abonados = {{ abonados_data|safe }};
+            let checkboxes_generated = []
 
-        <button type="submit">Exportar en archivo excel</button>
+            function load_abonados_chart() {
+                let total_per_company = {}
+                let from_date = new Date(document.getElementById("date-from").value.replaceAll("-", "/"))
+                let to_date = new Date(document.getElementById("date-to").value.replaceAll("-", "/"))
+                let columns = Object.keys(abonados[0]).filter(key => key != "ANNO" && key != "id" && key != "MES")
+                let table_content = []
+                let excluded_columns = []
+
+                abonados.forEach((abonado) => {
+                    Object.keys(abonado).forEach(key => {
+                        if (key == "ANNO" || key == "id" || key == "MES") {
+                            return
+                        }
+
+                        if ((abonado.ANNO >= from_date.getFullYear() && abonado.ANNO <= to_date.getFullYear()) == false) {
+                            return
+                        }
+
+                        if ((abonado.MES >= from_date.getMonth() + 1 && abonado.MES <= to_date.getMonth() + 1) == false) {
+                            return
+                        }
+                        
+                        if (!total_per_company[key]) {
+                            total_per_company[key] = 0
+                        }
+                        
+                        total_per_company[key] += abonado[key]
+                    })
+                })
+        
+                generate_check_filters(total_per_company)
+
+                checkboxes_generated.forEach(checkbox => {
+                    if(!checkbox.checked){
+                        excluded_columns.push(checkbox.id)
+                    }
+                })
+
+                excluded_columns.forEach(excluded_column => {
+                    columns = columns.filter(c => c != excluded_column)
+                })
+
+                abonados.forEach(t => {
+                    let registry = []
+
+                    if ((t.ANNO >= from_date.getFullYear() && t.ANNO <= to_date.getFullYear()) == false) {
+                        return
+                    }
+
+                    registry.push(`${t.ANNO}-${t.MES}` )
+
+                    columns.forEach(c => {
+                        registry.push(t[c])
+                    })
+
+                    table_content.push(registry)
+                })
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', "fecha");
+
+                columns.forEach(c => {
+                    data.addColumn('number', c);
+                })
+
+                data.addRows(table_content);
+
+                var options = {
+                    title: 'Tendencia empresas',
+                    hAxis: {
+                        title: 'Time'
+                    },
+                    vAxis: {
+                        title: 'Ganancias'
+                    },
+                    series: {
+                        // 1: {curveType: 'function'}
+                    }
+                };
+
+
+                var chart = new google.visualization.LineChart(document.getElementById('chart_tendencia'));
+                chart.draw(data, options);
+            }
+
+            function generate_check_filters(companies) {
+            
+                if (checkboxes_generated.length > 0) {
+                    return
+                }
+    
+                Object.keys(companies).forEach(key => {
+                    const company = companies[key]
+                    
+                    let container = document.createElement("div")
+                    
+                    let company_input = document.createElement("input")
+                    company_input.type = "checkbox"
+                    company_input.id = key
+                    company_input.checked = true
+                    company_input.onchange = refresh_chart
+    
+                    let company_name = document.createElement("span")
+                    company_name.innerText = key
+    
+                    container.appendChild(company_input)
+                    container.appendChild(company_name)
+    
+                    checkboxes_generated.push(company_input)
+                    
+                    document.getElementById("filters_container").appendChild(container)
+                })
+            }
+        
+            function on_change_dates() {
+                let from_date_input = document.getElementById("date-from")
+                let to_date_input = document.getElementById("date-to")
+
+                let from_date = new Date(from_date_input.value.replaceAll("-", "/"))
+                let to_date = new Date(to_date_input.value.replaceAll("-", "/"))
+
+                // "2012-01-01"
+                from_date_input.max = date_to_htlm_date(to_date)
+                to_date_input.min = date_to_htlm_date(from_date)
+
+                refresh_chart()
+            }
+
+            function date_to_htlm_date(date) {
+                var result = ""
+
+                var month = ""
+                var day = ""
+
+                if (date.getMonth() + 1 < 10) {
+                    month = `0${date.getMonth() + 1}`
+                }else{
+                    month = date.getMonth() + 1
+                }
+
+                if (date.getDate() < 10) {
+                    day = `0${date.getDate()}`
+                }else{
+                    day = date.getDate()
+                }
+
+                return `${date.getFullYear()}-${month}-${day}`
+            }
+
+            function refresh_chart() {
+                console.log("Repainting chart");
+                load_abonados_chart()
+            }
+        </script>
 
     </body>
 </html>

@@ -38,11 +38,11 @@
         <div class="form-content">
             <div>
                 <span>Desde </span>
-                <input type="date" id="date-from" min="2012-01-01" value="2012-01-01" max="2022-12-30" onchange="refresh_chart()"/>
+                <input type="date" id="date-from" min="2012-01-01" value="2012-01-01" max="2022-12-30" onchange="on_change_dates()"/>
             </div>
             <div>
                 <span>Hasta </span>
-                <input type="date" id="date-to" min="2012-01-01" value="2022-12-01" max="2022-12-30" onchange="refresh_chart()"/>
+                <input type="date" id="date-to" min="2012-01-01" value="2022-12-01" max="2022-12-30" onchange="on_change_dates()"/>
             </div>
         </div>
         <div class="checkbox-filter-container" id="filters_container"></div>
@@ -50,12 +50,8 @@
         <div style="display: grid; grid-template-columns: repeat(2,1fr);">
             <div id="chart_abonados" style="height: 500px;"></div>
             <div id="chart_trafico" style="height: 500px;"></div>
+            <div id="chart_ingresos" style="height: 500px;"></div>
         </div>
-
-
-
-        <h1>GRAFICA 2</h1>
-        <h1>GRAFICA 3</h1>
 
         <button type="submit">Exportar en archivo excel</button>
 
@@ -66,11 +62,13 @@
         google.charts.setOnLoadCallback(load_charts);
         let abonados = {{ abonados_data|safe }};
         let trafico = {{ trafico_data|safe }};
+        let ingresos = {{ ingresos_data|safe }};
         let checkboxes_generated = []
 
         function load_charts() {
             load_abonados_chart()
             load_trafico_chart()
+            load_ingresos_chart()
         }
         
         function load_abonados_chart() {
@@ -202,6 +200,75 @@
             chart.draw(data, options);
         }
 
+        function load_ingresos_chart() {
+            let total_per_company = {}
+            let from_date = new Date(document.getElementById("date-from").value.replaceAll("-", "/"))
+            let to_date = new Date(document.getElementById("date-to").value.replaceAll("-", "/"))
+            const AVERAGE_COLUM = "average"
+
+            let columns = Object.keys(ingresos[0]).filter(key => key != "ANNO" && key != "id" && key != "MES")
+            let table_content = []
+            let excluded_columns = []
+
+            checkboxes_generated.forEach(checkbox => {
+                if(!checkbox.checked){
+                    excluded_columns.push(checkbox.id)
+                }
+            })
+
+            excluded_columns.forEach(excluded_column => {
+                columns = columns.filter(c => c != excluded_column)
+            })
+
+            columns.push(AVERAGE_COLUM)
+
+            ingresos.forEach(ing => {
+                let registry = []
+
+                if ((ing.ANNO >= from_date.getFullYear() && ing.ANNO <= to_date.getFullYear()) == false) {
+                    return
+                }
+
+                registry.push(`${ing.ANNO}-${ing.MES}`)
+
+                let average = 0
+
+                columns.forEach(c => {
+
+                    if (c == AVERAGE_COLUM) {
+                        return
+                    }
+
+                    average += ing[c]
+                    registry.push(ing[c])
+                })
+
+                registry.push(average / (columns.length - 1))
+
+                table_content.push(registry)
+            })
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', "fecha");
+
+            columns.forEach(c => {
+                data.addColumn('number', c);
+            })
+
+            data.addRows(table_content);
+
+            var options = {
+            title : 'Ingresos compañias',
+            vAxis: {title: 'Ingresos'},
+            hAxis: {title: 'Tiempo'},
+            seriesType: 'bars',
+            series: {[columns.length - 1]: {type: 'line'}}
+            };
+
+            var chart = new google.visualization.ComboChart(document.getElementById('chart_ingresos'));
+            chart.draw(data, options);
+        }
+
         function generate_check_filters(companies) {
             
             if (checkboxes_generated.length > 0) {
@@ -231,6 +298,41 @@
             })
         }
         
+        function date_to_htlm_date(date) {
+            var result = ""
+
+            var month = ""
+            var day = ""
+
+            if (date.getMonth() + 1 < 10) {
+                month = `0${date.getMonth() + 1}`
+            }else{
+                month = date.getMonth() + 1
+            }
+
+            if (date.getDate() < 10) {
+                day = `0${date.getDate()}`
+            }else{
+                day = date.getDate()
+            }
+
+            return `${date.getFullYear()}-${month}-${day}`
+        }
+
+        function on_change_dates() {
+            let from_date_input = document.getElementById("date-from")
+            let to_date_input = document.getElementById("date-to")
+
+            let from_date = new Date(from_date_input.value.replaceAll("-", "/"))
+            let to_date = new Date(to_date_input.value.replaceAll("-", "/"))
+
+            // "2012-01-01"
+            from_date_input.max = date_to_htlm_date(to_date)
+            to_date_input.min = date_to_htlm_date(from_date)
+
+            refresh_chart()
+        }
+
         function refresh_chart() {
             console.log("Repainting chart");
             load_charts()
