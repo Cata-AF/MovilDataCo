@@ -6,8 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Histórico</title>
         <link rel="stylesheet" href={% static 'style.css' %}>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
+
     <body>
         <header>
             <div class="back">
@@ -26,52 +28,212 @@
                 </div>
             </div>
         </header>
+       
         <a href="view_Historia"
            type="submit" class="bg-red-600 hover:bg-red-600 text-white font-bold py-2 px-4 border-b-4 border-red-800 hover:border-red-800 rounded my-5">Ver histórico</a>
 
         <a href="view_Tendencia"
            type="submit" class="bg-red-300 hover:bg-red-500 text-white font-bold py-2 px-4 border-b-4 border-red-400 hover:border-red-700 rounded my-5">Realizar tendencia</a>
-        <div  class="form-content">
-            <div>
-                <input type="radio" name="plan"/><span>Plan Prepago</span>
-            </div>
-            <div>
-                <input type="radio" name="plan"/><span>Plan Postpago</span>
-            </div>
-        </div>
-        <div  class="form-content">
-            <div>
-                <span>Desde </span><input type="date" name="plan"/>
-            </div>
-            <div>
-                <span>Hasta </span><input type="date" name="plan"/>
-            </div>
-        </div>
-        <div  class="form-content">
-            <div>
-                <input type="checkbox" name="operador"/><span>CLARO</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>MOVISTAR</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>TIGO</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>ETB</span>
-            </div>
-            <div>
-                <input type="checkbox" name="operador"/><span>WOM</span>
-            </div>
 
-            <button type="submit">Realizar consulta</button>
+        <div class="form-content">
+            <div>
+                <span>Desde </span>
+                <input type="date" id="date-from" min="2012-01-01" value="2012-01-01" max="2022-12-30" onchange="refresh_chart()"/>
+            </div>
+            <div>
+                <span>Hasta </span>
+                <input type="date" id="date-to" min="2012-01-01" value="2022-12-01" max="2022-12-30" onchange="refresh_chart()"/>
+            </div>
+        </div>
+        <div class="checkbox-filter-container" id="filters_container"></div>
+
+        <div style="display: grid; grid-template-columns: repeat(2,1fr);">
+            <div id="chart_abonados" style="height: 500px;"></div>
+            <div id="chart_trafico" style="height: 500px;"></div>
         </div>
 
-        <h1>GRAFICA 1</h1>
+
+
         <h1>GRAFICA 2</h1>
         <h1>GRAFICA 3</h1>
 
         <button type="submit">Exportar en archivo excel</button>
 
     </body>
+
+    <script type="text/javascript">
+        google.charts.load('current', {packages: ['corechart', 'bar',"line"]});
+        google.charts.setOnLoadCallback(load_charts);
+        let abonados = {{ abonados_data|safe }};
+        let trafico = {{ trafico_data|safe }};
+        let checkboxes_generated = []
+
+        function load_charts() {
+            load_abonados_chart()
+            load_trafico_chart()
+        }
+        
+        function load_abonados_chart() {
+            let total_per_company = {}
+            let from_date = new Date(document.getElementById("date-from").value.replaceAll("-", "/"))
+            let to_date = new Date(document.getElementById("date-to").value.replaceAll("-", "/"))
+
+            abonados.forEach((abonado) => {
+                Object.keys(abonado).forEach(key => {
+                    if (key == "ANNO" || key == "id" || key == "MES") {
+                        return
+                    }
+
+                    if ((abonado.ANNO >= from_date.getFullYear() && abonado.ANNO <= to_date.getFullYear()) == false) {
+                        return
+                    }
+
+                    if ((abonado.MES >= from_date.getMonth() + 1 && abonado.MES <= to_date.getMonth() + 1) == false) {
+                        return
+                    }
+                    
+                    if (!total_per_company[key]) {
+                        total_per_company[key] = 0
+                    }
+                    
+                    total_per_company[key] += abonado[key]
+                })
+            })
+    
+            generate_check_filters(total_per_company)
+
+            let table_content = [
+                ['asdsa', 'Total accesos', { role: 'style' } ],
+            ]
+
+    
+            Object.keys(total_per_company).forEach(key => {
+                let is_checked = false
+                checkboxes_generated.forEach(checkbox => {
+                    if(key == checkbox.id){
+                        is_checked = checkbox.checked;
+                    }
+                })
+
+                if (!is_checked) {
+                    return
+                }
+
+                table_content.push([key, total_per_company[key], 'color: #76A7FA'])
+            })
+    
+            var options = {
+                title: 'Número de abonados por compañía',
+                chartArea: {width: '50%'},
+                hAxis: {
+                    title: 'Compañía',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Número de abonados'
+                }
+            };
+    
+            let data = google.visualization.arrayToDataTable(table_content)
+            var chart = new google.visualization.ColumnChart(
+            document.getElementById('chart_abonados'));
+            chart.draw(data, options);
+        }
+
+        function load_trafico_chart() {
+            let total_per_company = {}
+            let from_date = new Date(document.getElementById("date-from").value.replaceAll("-", "/"))
+            let to_date = new Date(document.getElementById("date-to").value.replaceAll("-", "/"))
+
+            let columns = Object.keys(trafico[0]).filter(key => key != "ANNO" && key != "id" && key != "MES")
+            let table_content = []
+            let excluded_columns = []
+
+            checkboxes_generated.forEach(checkbox => {
+                if(!checkbox.checked){
+                    excluded_columns.push(checkbox.id)
+                }
+            })
+
+            excluded_columns.forEach(excluded_column => {
+                columns = columns.filter(c => c != excluded_column)
+            })
+
+            trafico.forEach(t => {
+                let registry = []
+
+                if ((t.ANNO >= from_date.getFullYear() && t.ANNO <= to_date.getFullYear()) == false) {
+                    return
+                }
+
+                registry.push(`${t.ANNO}-${t.MES}` )
+
+                columns.forEach(c => {
+                    registry.push(t[c])
+                })
+
+                table_content.push(registry)
+            })
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', "fecha");
+
+            columns.forEach(c => {
+                data.addColumn('number', c);
+            })
+
+            data.addRows(table_content);
+
+            var options = {
+                title: 'Trafico empresas',
+                hAxis: {
+                    title: 'Time'
+                },
+                vAxis: {
+                    title: 'Trafico'
+                },
+                series: {
+                    // 1: {curveType: 'function'}
+                }
+            };
+
+
+            var chart = new google.visualization.LineChart(document.getElementById('chart_trafico'));
+            chart.draw(data, options);
+        }
+
+        function generate_check_filters(companies) {
+            
+            if (checkboxes_generated.length > 0) {
+                return
+            }
+
+            Object.keys(companies).forEach(key => {
+                const company = companies[key]
+                
+                let container = document.createElement("div")
+                
+                let company_input = document.createElement("input")
+                company_input.type = "checkbox"
+                company_input.id = key
+                company_input.checked = true
+                company_input.onchange = refresh_chart
+
+                let company_name = document.createElement("span")
+                company_name.innerText = key
+
+                container.appendChild(company_input)
+                container.appendChild(company_name)
+
+                checkboxes_generated.push(company_input)
+                
+                document.getElementById("filters_container").appendChild(container)
+            })
+        }
+        
+        function refresh_chart() {
+            console.log("Repainting chart");
+            load_charts()
+        }
+    </script>
 </html>

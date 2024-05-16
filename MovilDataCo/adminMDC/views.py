@@ -1,5 +1,7 @@
+import json
 from django.shortcuts import render, redirect
-from .models import Usuarios
+from .models import Abonados, Trafico, Usuarios
+from django.db import models
 
 # Create your views here.
 
@@ -26,7 +28,13 @@ def processing_file(request):
     return render(request, 'Processing.html')
 
 def view_History(request):
-    return render(request, 'History.html')
+    abonados = Abonados.objects.all()
+    trafico = Trafico.objects.all()
+    return render(request, 'History.html', {
+        "abonados": abonados,
+        "abonados_data": json.dumps(list(abonados.values())),
+        "trafico_data": json.dumps(list(trafico.values()))
+    })
 
 def view_Shift(request):
     return render(request, 'Shift.html')
@@ -34,7 +42,10 @@ def view_Shift(request):
 
 def view_usuarios(request):
     usuarios = Usuarios.objects.all()
-    return render(request, 'Users.html', {'users': usuarios})
+    return render(request, 'Users.html', {
+        'users': usuarios,
+        "users_data": json.dumps(list(usuarios.values()))
+    })
 
 def view_create_users(request):
     return render(request, 'CreateUsers.html')
