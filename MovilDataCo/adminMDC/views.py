@@ -6,7 +6,7 @@ from django.db import models
 # Create your views here.
 
 def inicio(request):
-    return render(request, 'MainInterface.html')
+    return render(request, 'index.html')
 
 def help_password(request):
     return render(request, 'HelpPassword.html')
